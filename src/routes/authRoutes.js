@@ -44,7 +44,7 @@ router.post("/signup", async (req, res) => {
     }
 
     //create a new user
-    const user = new User(username, email, password);
+    const user = new User({username, email, password});
     //store in db
     await user.save();
 
