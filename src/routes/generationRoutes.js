@@ -1,5 +1,5 @@
 import express from "express";
-import generation from "../functions/generate";
+import generation from "../functions/generate.js";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 
@@ -53,5 +53,6 @@ router.post("/generation", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 export default router;
