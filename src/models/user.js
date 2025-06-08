@@ -18,6 +18,28 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 8,
     },
+    resetCode: {
+      type: String,
+      default: null,
+    },
+    resetCodeExpires: {
+      type: Date,
+      default: null,
+    },
+
+    firstTime: {
+      type: Boolean,
+      default: true,
+    },
+    diet: {
+      type: Object,
+      default: null,
+    
+    },
+    hasPaid: {
+      type: Boolean,
+      default: true
+    }
   },
   { timestamps: true }
 );
@@ -33,6 +55,16 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.comparePassword = async function (userPassword) {
   return await bcrypt.compare(userPassword, this.password);
+};
+
+userSchema.methods.compareCode = async function (userCode) {
+  if (
+    userCode == this.resetCode &&
+    new Date(Date.now()) < this.resetCodeExpires
+  ) {
+    return true;
+  }
+  return false;
 };
 
 const User = mongoose.model("User", userSchema);
