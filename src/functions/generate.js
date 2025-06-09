@@ -31,29 +31,13 @@ async function generate(input) {
     const jsonStr = answer.slice(start, end + 1);
 
     const finalAnswer = JSON5.parse(jsonStr);
-    return finalAnswer.meals[0];
+    return finalAnswer;
   } catch (error) {
     console.error("Error generating content:", error);
     throw error;
   }
 }
 
-console.log(await generate(`Generate a diet that has 4 meals, 2500 calories, and 180g protein
-   and include a healthy dessert. Give the name of each meal, each ingredient with its amount in grams, and ensure all ingredients are base items (e.g., chicken breast, rice, broccoli). Return the result as a JSON object in the following format:
-
-{
-  "meals": [
-    {
-      "name": "Meal Name",
-      "ingredients": [
-        { "name": "Ingredient 1", "amount_g": 100 },
-        { "name": "Ingredient 2", "amount_g": 150 }
-      ]
-    },
-    ...
-  ]
-}
-`))
 export default generate;
 
 /*`Generate a weekly workout plan (Monday-Sunday) as a JSON object.
