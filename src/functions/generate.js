@@ -30,38 +30,30 @@ async function generate(input) {
 
     const jsonStr = answer.slice(start, end + 1);
 
-    console.log(jsonStr);
-
     const finalAnswer = JSON5.parse(jsonStr);
-    return finalAnswer.caloriesBurned;
+    return finalAnswer.meals[0];
   } catch (error) {
     console.error("Error generating content:", error);
     throw error;
   }
 }
 
-console.log(
-  await generate(`Generate a weekly workout plan (Monday-Sunday) as a JSON object.
+console.log(await generate(`Generate a diet that has 4 meals, 2500 calories, and 180g protein
+   and include a healthy dessert. Give the name of each meal, each ingredient with its amount in grams, and ensure all ingredients are base items (e.g., chicken breast, rice, broccoli). Return the result as a JSON object in the following format:
 
-**Constraints:**
-- 4 training days, rest days for the others.
-- 12-18 working sets per week per muscle group. Legs count as one muscle.
-- include cardio
-- Use common gym exercises and light cardio types.
-
-return a json format only with pure values do not add unneeded text. if you have an estimation of something just write one average number do not add extra information.
-
-**JSON Format:**
 {
-  "caloriesBurned": "Estimate based on workout intensity and duration.",
-  "workouts": [
-    { "monday": { "day_type": "workout", "focus_muscles": ["Muscle1", "Muscle2"], "exercises": [{"name": "Exercise", "sets": N, "reps": "X-Y"}], "cardio": {"type": "CardioType", "duration_minutes": N} } },
-    { "tuesday": { "day_type": "rest", "activity": "Rest activity" } },
-    // ... continue for all 7 days with similar structure
+  "meals": [
+    {
+      "name": "Meal Name",
+      "ingredients": [
+        { "name": "Ingredient 1", "amount_g": 100 },
+        { "name": "Ingredient 2", "amount_g": 150 }
+      ]
+    },
+    ...
   ]
-}`)
-);
-
+}
+`))
 export default generate;
 
 /*`Generate a weekly workout plan (Monday-Sunday) as a JSON object.
