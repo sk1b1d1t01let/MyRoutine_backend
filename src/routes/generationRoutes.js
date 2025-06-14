@@ -12,18 +12,22 @@ router.post("/generation", async (req, res) => {
   console.log("Authorization header:", authHeader);
 
   if (!authHeader) {
+    console.error("Missing authorization header");
     return res.status(401).json({ message: "Missing authorization header" });
   }
   const token = authHeader.split(" ")[1];
   let decoded;
 
   try {
+    
     decoded = jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
+    console.error("Token verification failed:", err);
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 
   if (!prompt) {
+    console.error("Prompt is required but not provided");
     return res.status(400).json({ message: "Prompt is required" });
   }
 
@@ -31,10 +35,12 @@ router.post("/generation", async (req, res) => {
     const user = await User.findOne({ email: decoded.email });
 
     if (!user) {
+      console.error("User not found for email:", decoded.email);
       return res.status(404).json({ message: "User not found" });
     }
 
     if (!user.hasPaid) {
+      console.error("User has not paid for subscription");
       return res.status(403).json({
         message: "Please subscribe to access all features",
       });
