@@ -8,11 +8,13 @@ const router = express.Router();
 router.post("/generation", async (req, res) => {
   const { prompt } = req.body;
   const authHeader = req.headers["authorization"];
+  console.log(prompt)
+  const mut = null
 
   if (!authHeader) {
     return res.status(401).json({ message: "Missing authorization header" });
   }
-
+  console.log(authHeader)
   const token = authHeader.split(" ")[1];
   let decoded;
 
@@ -38,8 +40,9 @@ router.post("/generation", async (req, res) => {
         message: "Please subscribe to access all features",
       });
     }
-
+    
     const generated = await generation(prompt);
+    console.log(generated)
 
     if (!generated) {
       return res
