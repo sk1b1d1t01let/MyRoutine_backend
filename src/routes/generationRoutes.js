@@ -8,13 +8,11 @@ const router = express.Router();
 router.post("/generation", async (req, res) => {
   const { prompt } = req.body;
   const authHeader = req.headers["authorization"];
-  console.log(prompt)
   const mut = null
 
   if (!authHeader) {
     return res.status(401).json({ message: "Missing authorization header" });
   }
-  console.log(authHeader)
   const token = authHeader.split(" ")[1];
   let decoded;
 
@@ -42,14 +40,13 @@ router.post("/generation", async (req, res) => {
     }
     
     const generated = await generation(prompt);
-    console.log(generated)
 
     if (!generated) {
       return res
         .status(500)
         .json({ message: "Generation failed, please try again" });
     }
-
+    console.log(generated)
     return res.status(200).json({ generated });
   } catch (error) {
     console.error("Error in generation route", error);
