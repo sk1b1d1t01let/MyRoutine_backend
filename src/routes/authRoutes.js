@@ -5,7 +5,7 @@ import nodemailer from "nodemailer";
 
 const router = express.Router();
 
-const generateToken = (userId, username, email) => {
+const generateToken = (userId, email) => {
   return jwt.sign({ userId, username, email }, process.env.JWT_SECRET);
 };
 
@@ -43,7 +43,7 @@ router.post("/signup", async (req, res) => {
 
     await user.save();
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, email);
 
     res.status(201).json({
       token,
@@ -75,7 +75,7 @@ router.post("/login", async (req, res) => {
     if (!isPasswordCorrect)
       return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, email);
     console.log("done");
 
     res.status(200).json({
