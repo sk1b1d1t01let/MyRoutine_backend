@@ -8,7 +8,8 @@ const router = express.Router();
 router.post("/generation", async (req, res) => {
   const { prompt } = req.body;
   const authHeader = req.headers["authorization"];
-  const mut = null
+  console.log("Received prompt:", prompt);
+  console.log("Authorization header:", authHeader);
 
   if (!authHeader) {
     return res.status(401).json({ message: "Missing authorization header" });
