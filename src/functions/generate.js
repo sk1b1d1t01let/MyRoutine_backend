@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import JSON5 from "json5";
+import getNutrition from "./getNutrition.js";
 
 async function generate(input) {
   const apiKey = "AIzaSyDp7tmz_51cVkCNW0dh3ey3KBAxwCGPB8M";
@@ -30,7 +31,45 @@ async function generate(input) {
 
     const jsonStr = answer.slice(start, end + 1);
 
-    const finalAnswer = JSON5.parse(jsonStr);
+    const generated = JSON5.parse(jsonStr);
+
+async function addNutritionDataToMeals(finalAnswer) {
+  const updatedMeals = await Promise.all(
+    finalAnswer.meals.map(async (meal) => {
+      const updatedIngredients = await Promise.all(
+        meal.ingredients.map(async (ingredient) => {
+          try {
+            const nutritionData = await getNutrition(ingredient.name);
+            return {
+              ...ingredient, 
+              nutrition: {
+                nutrients: nutritionData.nutrients,
+                caloricBreakdown: nutritionData.caloricBreakdown,
+                weightPerServing: nutritionData.weightPerServing,
+              },
+            };
+          } catch (error) {
+            console.error(`Error fetching nutrition for ${ingredient.name}:`, error);
+            return {
+              ...ingredient, 
+              nutrition: null, 
+            };
+          }
+        })
+      );
+      return {
+        ...meal, 
+        ingredients: updatedIngredients,
+      };
+    })
+  );
+  return {
+    ...finalAnswer,
+    meals: updatedMeals
+  };
+}
+
+    const finalAnswer = await addNutritionDataToMeals(generated);
     return finalAnswer;
   } catch (error) {
     console.error("Error generating content:", error);
@@ -40,7 +79,30 @@ async function generate(input) {
 
 export default generate;
 
-/*`Generate a weekly workout plan (Monday-Sunday) as a JSON object.
+
+
+
+/*
+`Generate a diet that has ${foodTimes} meals including snacks, ${calories} calories, and ${protein}g protein
+    ${dessert ? " and include a healthy dessert" : "do not include a dessert"}.
+   Give the name of each meal(make sure the name is clear because i am going to fetch information about each one from spoonacular api), each ingredient with its amount in grams, and ensure all ingredients are base items (e.g., chicken breast, rice, broccoli). Return the result as a JSON object in the following format:
+
+{
+  "meals": [
+    {
+      "name": "Meal Name",
+      "ingredients": [
+        { "name": "Ingredient 1", "amount_g": 100 },
+        { "name": "Ingredient 2", "amount_g": 150 }
+      ],
+      "howToMake": "explain how to make",
+    },
+    ...
+  ]
+}
+`
+
+`Generate a weekly workout plan (Monday-Sunday) as a JSON object.
 
 **Constraints:**
 - {trainingDays} training days, rest days for the others.
