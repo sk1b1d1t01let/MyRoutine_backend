@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema(
       default: null,
     
     },
+    workoutPlan: {
+      type: Object,
+      default: null,
+    },
     hasPaid: {
       type: Boolean,
       default: true

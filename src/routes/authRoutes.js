@@ -76,10 +76,17 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
 
     const token = generateToken(user._id, email);
+
+    diet = user.diet;
+    workoutPlan = user.workoutPlan; 
     console.log("done");
+
+
 
     res.status(200).json({
       token,
+      diet,
+      workoutPlan,
       user: {
         username: user.username,
         email: user.email,

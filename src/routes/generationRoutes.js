@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 const router = express.Router();
 
 router.post("/generation", async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, type } = req.body;
   const authHeader = req.headers["authorization"];
   console.log("Received prompt:", prompt);
   console.log("Authorization header:", authHeader);
@@ -47,6 +47,15 @@ router.post("/generation", async (req, res) => {
     }
     
     const generated = await generation(prompt);
+
+    if(type === "diet") {
+      user.diet = generated;
+      await user.save();
+    }
+    if(type === "workout") {
+      user.workout = generated;
+      await user.save();
+    }
 
     if (!generated) {
       return res
