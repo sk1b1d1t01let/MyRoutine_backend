@@ -225,7 +225,7 @@ router.post("/verifyCode", async (req, res) => {
 
 router.post("/changePassword", async (req, res) => {
   try {
-    const { newPassword, email } = req.body;
+    const { newPassword } = req.body;
 
     const authHeader = req.headers["authorization"];
     if (!authHeader) {
@@ -257,8 +257,10 @@ router.post("/changePassword", async (req, res) => {
 router.post("/firstTime", async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("Checking first time for email:", email);
+    const user = await User.findOne({ email: email });
 
-    const user = await User.findOne({ email });
+    console.log(user)
 
     if (!user) {
       return res.status(404).json({ message: "User not found." });
