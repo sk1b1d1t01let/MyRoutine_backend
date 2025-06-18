@@ -77,8 +77,8 @@ router.post("/login", async (req, res) => {
 
     const token = generateToken(user._id, email);
 
-    diet = user.diet;
-    workoutPlan = user.workoutPlan; 
+    const diet = user.diet;
+    const workoutPlan = user.workoutPlan; 
     console.log("done");
 
 
