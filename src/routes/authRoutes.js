@@ -256,9 +256,21 @@ router.post("/changePassword", async (req, res) => {
 
 router.post("/firstTime", async (req, res) => {
   try {
-    const { email } = req.body;
-    console.log("Checking first time for email:", email);
-    const user = await User.findOne({ email: email });
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) {
+      return res.status(401).json({ message: "Missing authorisation header" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    const user = await User.findOne({ email: decoded.email });
 
     console.log(user)
 
