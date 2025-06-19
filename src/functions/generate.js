@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import JSON5 from "json5";
 import getNutrition from "./getNutrition.js";
 
-async function generate(input) {
+async function generate(input, type) {
   const apiKey = "AIzaSyDp7tmz_51cVkCNW0dh3ey3KBAxwCGPB8M";
 
   if (!apiKey) {
@@ -68,7 +68,9 @@ async function addNutritionDataToMeals(finalAnswer) {
     meals: updatedMeals
   };
 }
-
+    if(type === "workout") {
+      return generated;}
+      
     const finalAnswer = await addNutritionDataToMeals(generated);
     return finalAnswer;
   } catch (error) {

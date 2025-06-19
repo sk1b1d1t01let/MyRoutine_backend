@@ -46,7 +46,7 @@ router.post("/generation", async (req, res) => {
       });
     }
     
-    const generated = await generation(prompt);
+    const generated = await generation(prompt, type);
 
     if(type === "diet") {
       user.diet = generated;
