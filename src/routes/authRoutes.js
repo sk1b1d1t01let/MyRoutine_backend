@@ -87,6 +87,7 @@ router.post("/login", async (req, res) => {
       token,
       diet,
       workoutPlan,
+      firstTime: user.firstTime,
       user: {
         username: user.username,
         email: user.email,
@@ -107,9 +108,29 @@ router.post("/token", async (req, res) => {
 
     const token = authHeader.split(" ")[1];
 
-    const verification = jwt.verify(token, process.env.JWT_SECRET);
+   let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
-    return res.status(200).json({ message: "Authorised" });
+    const user = await User.findOne({ email: decoded.email });
+
+    console.log(user)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const wasFirstTime = user.firstTime;
+
+    if (wasFirstTime) {
+      user.firstTime = false;
+      await user.save();
+    }
+
+    return res.status(200).json({ firstTime: wasFirstTime, message: "Authorised" });
   } catch (error) {
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({ message: "Invalid token" });
@@ -254,42 +275,6 @@ router.post("/changePassword", async (req, res) => {
   }
 });
 
-router.post("/firstTime", async (req, res) => {
-  try {
-    const authHeader = req.headers["authorization"];
-    if (!authHeader) {
-      return res.status(401).json({ message: "Missing authorisation header" });
-    }
 
-    const token = authHeader.split(" ")[1];
-
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
-      return res.status(401).json({ message: "Invalid or expired token" });
-    }
-
-    const user = await User.findOne({ email: decoded.email });
-
-    console.log(user)
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    const wasFirstTime = user.firstTime;
-
-    if (wasFirstTime) {
-      user.firstTime = false;
-      await user.save();
-    }
-
-    return res.status(200).json({ firstTime: wasFirstTime });
-  } catch (error) {
-    console.error("Error in /firstTime route:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
 
 export default router;
