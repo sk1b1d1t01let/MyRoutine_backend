@@ -79,6 +79,12 @@ router.post("/login", async (req, res) => {
 
     const diet = user.diet;
     const workoutPlan = user.workoutPlan; 
+     const wasFirstTime = user.firstTime;
+
+    if (wasFirstTime) {
+      user.firstTime = false;
+      await user.save();
+    }
     console.log("done");
 
 
@@ -87,7 +93,7 @@ router.post("/login", async (req, res) => {
       token,
       diet,
       workoutPlan,
-      firstTime: user.firstTime,
+      firstTime: user.wasFirstTime,
       user: {
         username: user.username,
         email: user.email,

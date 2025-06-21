@@ -51,3 +51,5 @@ const getNutrition = async (food) => {
 };
 
 export default getNutrition;
+
+console.log(await getNutrition("apple")); // Example usage, should be removed in production
