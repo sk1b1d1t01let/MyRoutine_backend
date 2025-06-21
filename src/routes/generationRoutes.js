@@ -53,7 +53,7 @@ router.post("/generation", async (req, res) => {
       await user.save();
     }
     if(type === "workout") {
-      user.workout = generated;
+      user.workoutPlan = generated;
       await user.save();
     }
 
