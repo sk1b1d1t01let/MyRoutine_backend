@@ -93,7 +93,7 @@ router.post("/login", async (req, res) => {
       token,
       diet,
       workoutPlan,
-      firstTime: user.wasFirstTime,
+      firstTime: wasFirstTime,
       user: {
         username: user.username,
         email: user.email,
