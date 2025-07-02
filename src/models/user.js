@@ -34,7 +34,6 @@ const userSchema = new mongoose.Schema(
     diet: {
       type: Object,
       default: null,
-    
     },
     workoutPlan: {
       type: Object,
@@ -42,8 +41,24 @@ const userSchema = new mongoose.Schema(
     },
     hasPaid: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
+    timesPaid: {
+      type: Number,
+      default: 0,
+    },
+    goalWeight: {
+      type: Number,
+      default: 0,
+    },
+    currentWeight: {
+      type: Array,
+      default: [],
+    },
+    invitedPeople: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

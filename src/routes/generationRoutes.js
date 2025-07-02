@@ -2,6 +2,7 @@ import express from "express";
 import generation from "../functions/generate.js";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
+import getNutrition from "../functions/getNutrition.js";
 
 const router = express.Router();
 
@@ -19,7 +20,6 @@ router.post("/generation", async (req, res) => {
   let decoded;
 
   try {
-    
     decoded = jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
     console.error("Token verification failed:", err);
@@ -45,14 +45,14 @@ router.post("/generation", async (req, res) => {
         message: "Please subscribe to access all features",
       });
     }
-    
+
     const generated = await generation(prompt, type);
 
-    if(type === "diet") {
+    if (type === "diet") {
       user.diet = generated;
       await user.save();
     }
-    if(type === "workout") {
+    if (type === "workout") {
       user.workoutPlan = generated;
       await user.save();
     }
@@ -62,7 +62,7 @@ router.post("/generation", async (req, res) => {
         .status(500)
         .json({ message: "Generation failed, please try again" });
     }
-    console.log(generated)
+    console.log(generated);
     return res.status(200).json({ generated });
   } catch (error) {
     console.error("Error in generation route", error);
@@ -70,5 +70,18 @@ router.post("/generation", async (req, res) => {
   }
 });
 
+router.post("/search", async (req, res) => {
+  try {
+    const { food } = req.body;
+    if(!food){
+      return res.status(400).json({message: "please enter a food"})
+    }
+
+    
+    const response = await getNutrition(food)
+
+    
+  } catch (error) {}
+});
 
 export default router;
