@@ -3,6 +3,7 @@ import generation from "../functions/generate.js";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import getNutrition from "../functions/getNutrition.js";
+import searchMeals from "../functions/searchMeal.js";
 
 const router = express.Router();
 
@@ -70,18 +71,105 @@ router.post("/generation", async (req, res) => {
   }
 });
 
-router.post("/search", async (req, res) => {
+router.post("/searchIngredient", async (req, res) => {
   try {
     const { food } = req.body;
-    if(!food){
-      return res.status(400).json({message: "please enter a food"})
+
+    const authHeader = req.headers["authorization"];
+    console.log("Received prompt:", prompt);
+    console.log("Authorization header:", authHeader);
+
+    if (!authHeader) {
+      console.error("Missing authorization header");
+      return res.status(401).json({ message: "Missing authorization header" });
+    }
+    const token = authHeader.split(" ")[1];
+    let decoded;
+
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
 
-    
-    const response = await getNutrition(food)
+    const user = await User.findOne({ email: decoded.email });
 
-    
-  } catch (error) {}
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.monthlyRequests === 0) {
+      return res.status(500).json({ message: "Exceeded request limit" });
+    }
+
+    user.monthlyRequests--;
+
+    await user.save();
+
+    const result = getNutrition(food);
+
+    if (!result) {
+      return res.status(404).json({ message: "food information not found" });
+    }
+
+    const finalResult = {
+      nutrients: result.nutrients,
+      caloricBreakdown: result.caloricBreakdown,
+      weightPerServing: result.weightPerServing,
+    };
+
+    return res.status(200).json({ food: finalResult });
+  } catch (error) {
+    console.error("Server error:", error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.post("/searchMeal", async (req, res) => {
+  try {
+    const { meal } = req.body;
+    if (!meal) {
+      return res.status(400).json({ message: "No meal provided" });
+    }
+
+    const authHeader = req.headers["authorization"];
+    console.log("Received prompt:", prompt);
+    console.log("Authorization header:", authHeader);
+
+    if (!authHeader) {
+      console.error("Missing authorization header");
+      return res.status(401).json({ message: "Missing authorization header" });
+    }
+    const token = authHeader.split(" ")[1];
+    let decoded;
+
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    const user = await User.findOne({ email: decoded.email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.monthlyRequests === 0) {
+      return res.status(500).json({ message: "Exceeded request limit" });
+    }
+
+    user.monthlyRequests--;
+
+    await user.save();
+
+    const answer = searchMeals(meal);
+
+    return res.status(200).json({ meal: answer });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 });
 
 export default router;

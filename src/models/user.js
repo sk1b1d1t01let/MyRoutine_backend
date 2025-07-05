@@ -59,6 +59,11 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    monthlyRequests: {
+      type: Number,
+
+      default: 90,
+    },
   },
   { timestamps: true }
 );
